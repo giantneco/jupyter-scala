@@ -29,9 +29,12 @@ RUN curl -L -o /usr/local/bin/coursier https://git.io/vgvpD && \
     ./almond --install && \
     rm ./almond
 
-USER $NB_UID
+ENV TINI_VERSION v0.6.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin/tini
+RUN chmod +x /usr/bin/tini
+
+ENTRYPOINT ["/usr/bin/tini", "--", "jupyter","notebook", "--port=8888", "--ip=0.0.0.0", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
 
 EXPOSE 8888:8888
 
-ENTRYPOINT ["jupyter","notebook", "--ip=0.0.0.0", "--no-browser"]
-
+USER $NB_UID
